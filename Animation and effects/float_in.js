@@ -1,3 +1,5 @@
+// note the ids and class names, that need to be assinged inorder for this to work, please see css sheet for addtional parts of the animation. 
+
 const floaters = document.querySelectorAll('.float-in');
 const floaters2 = document.querySelectorAll('.float-in-sec');
 const sliders = document.querySelectorAll('#slide-in');
