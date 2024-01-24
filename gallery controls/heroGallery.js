@@ -1,90 +1,83 @@
-const boxObj = document.getElementById('boxObject');
-const imageObj = document.querySelectorAll('.image-objects');
-
-const boxHeight = boxObj.clientHeight;
-const boxWidth = boxObj.clientWidth;
+const innerObj = document.getElementById('innerBox');
 
 
-function imageMove1() {
-  let imgCount = 1;
-  let rowCount = 1;
-  for (let image of imageObj) { 
-    if (imgCount == 5) {
-			imgCount = 1;
-      rowCount++;
-    };
-    let mather = numbStuff(imgCount, rowCount);
-    let imageY =  (((mather[1] * boxHeight)- mather[2]) / (imgCount* 10))*-1;
-    let imageX =  ((mather[2] - boxWidth) + mather[0]);
-    image.style.transform = `translate(${imageX}px, ${imageY}px)`; 
-    imgCount++;
-    console.log(imageY, imageX, rowCount)
-    for (let i = 0; i < imageObj.length; i++) {
-      imageObj[i].classList.remove("display-off");
-    };
-  }
-}
-
-
-function imageMove2() {
-  let imgCount = 1;
-  let rowCount = 1;
-  for (let image of imageObj) { 
-    if (imgCount == 5) {
-			imgCount = 1;
-      rowCount++;
-    };
-    let mather = numbStuff(imgCount, rowCount);
-    let imageY =  ((mather[1] * boxHeight)/mather[2]) * (30)-1;
-    let imageX =  ((mather[2] - boxWidth) + mather[0]);
-    image.style.transform = `translate(${imageX}px, ${imageY}px)`; 
-    imgCount++;
-    console.log(imageY, imageX, rowCount)
-  }
-}
-
-
-function imageMove3() {
-  let imgCount = 1;
-  let rowCount = 1;
-  for (let image of imageObj) { 
-    if (imgCount == 5) {
-			imgCount = 1;
-      rowCount++;
-    };
-    let mather = numbStuff(imgCount, rowCount);
-    let imageY =  ((mather[1] * 2.5) + mather[0])-(rowCount* 120);
-    let imageX =  (mather[2] * 1.2) - mather[0]-600;
-    image.style.transform = `translate(${imageX}px, ${imageY}px)`; 
-    imgCount++;
-    console.log(imageY, imageX, rowCount)
-  }
-}
 
 async function executeImageMoves() {
-  const imageObj = document.getElementsByClassName('your-image-class'); // Replace with your actual image elements
-  const imageMoves = [imageMove1, imageMove2, imageMove3]; // Array of your imageMove functions
-
-  for (let i = 0; i < imageMoves.length; i++) {
-    const imageMoveFunction = imageMoves[i];
-
+  imageObj = document.querySelectorAll('.image-objects');
+  
+  for (i = 0; i < imageObj.length; ++i) {
+    imageObj[i].style.transform.transition = 'transform 10000';
+    imageObj[i].style.transform = 'translate(100vw) scale(108%, 108%)'
+    imageObj[i].style.opacity = 1;
+    //console.log(imageObj[i].clientWidth)
     await new Promise((resolve) => {
+
       setTimeout(() => {
-        imageMoveFunction(imageObj);
+
+
+        imageObj[i].style.transform = 'translate(-100vw)'
+
+        //console.log('re-run')
         resolve();
-      }, i * 800); // Adjust the delay (1000ms = 1 second) to control the timing between function executions
+      }, 5000); 
+      
     });
+    if (i === (imageObj.length - 1)) {
+      i = 0;
+      //imageObj[-1].classList.add('display-off')
+    } 
+    //tempRight.classList.remove('display-off')
   }
+  return;
 }
 
-// Call the executeImageMoves function when the page is loaded
+
+// Featch call for images set by the onswer
 window.addEventListener('load', () => {
-  executeImageMoves();
+	fetch('http://api.softsubversion.com/v1/index/', {
+		method: 'GET',
+		headers: {
+		  'Content-Type': 'application/json'
+		}
+	})
+  .then(response => {
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    return response.json();
+  })
+  .then(data => {
+    //console.log(data.herSet.length)
+    for (let i = 0; i < data.herSet.length; i++) {
+      // Create the div element
+      const imageObjectDiv = document.createElement('div');
+      
+      // Add classes and styles to the div
+      imageObjectDiv.className = 'image-objects';
+      imageObjectDiv.style.opacity = 0;
+      imageObjectDiv.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('${data.herSet[i].image_link}')`;
+    
+      // Add classes and styles to the array
+      imageObjectDiv.style.transform.transition = 'transform 10000';
+      imageObjectDiv.style.transform = 'translate(-100vw)'
+      // Append the div to the container
+      innerObj.appendChild(imageObjectDiv);
+      
+      
+      //console.log('ste1')
+    }
+    setTimeout(() => {
+      executeImageMoves();
+    }, 800);
+    
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+	
 });
 
-function numbStuff(imgCount, rowCount) {
-	let rowN = rowCount * 300;
-  let y1 = (imgCount*boxHeight)/10;
-  let x1 = (imgCount*boxWidth)/12;
-  return [x1, y1, rowN]; 
-}
+
+

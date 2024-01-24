@@ -10,9 +10,4 @@ class Carousel {
         this.carouselControls = controls;
         this.carouselArray = [...items];
     }
-
-    updateGallery(){
-        
-    }
-
 }
